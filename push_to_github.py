@@ -32,6 +32,26 @@ def is_git_initialized():
     return os.path.isdir('.git')
 
 
+def ensure_script_in_gitignore():
+    """Ensure this script is in .gitignore to prevent committing it."""
+    gitignore_path = '.gitignore'
+    script_name = 'push_to_github.py'
+    
+    # Read existing .gitignore or create empty list
+    existing_lines = []
+    if os.path.exists(gitignore_path):
+        with open(gitignore_path, 'r') as f:
+            existing_lines = f.read().splitlines()
+    
+    # Check if script is already in .gitignore
+    if script_name not in existing_lines:
+        print(f"📝 Adding {script_name} to .gitignore...")
+        with open(gitignore_path, 'a') as f:
+            if existing_lines and not existing_lines[-1].strip() == '':
+                f.write('\n')
+            f.write(f'# Automation scripts\n{script_name}\n')
+
+
 def get_user_input():
     """Get repository details from user."""
     print("\n=== GitHub Repository Setup ===\n")
@@ -65,10 +85,14 @@ def initialize_and_push_new_repo(repo_name, description, visibility):
     if not os.path.exists('.gitignore'):
         print("📝 Creating basic .gitignore...")
         with open('.gitignore', 'w') as f:
+            f.write("# Automation scripts\npush_to_github.py\n\n")
             f.write("# Python\n__pycache__/\n*.py[cod]\n*.so\n.Python\nvenv/\nENV/\n\n")
             f.write("# Java\ntarget/\n*.class\n*.jar\n*.war\n\n")
             f.write("# IDE\n.idea/\n.vscode/\n*.swp\n*.swo\n\n")
             f.write("# OS\n.DS_Store\nThumbs.db\n")
+    
+    # Ensure script is in .gitignore
+    ensure_script_in_gitignore()
     
     # Add all files
     print("➕ Adding files to git...")
@@ -104,6 +128,9 @@ def initialize_and_push_new_repo(repo_name, description, visibility):
 def push_existing_repo():
     """Push uncommitted changes to existing repository."""
     print("\n🔄 Existing repository detected...\n")
+    
+    # Ensure script is in .gitignore
+    ensure_script_in_gitignore()
     
     # Check if there are any changes
     status = run_command("git status --porcelain", capture_output=True)

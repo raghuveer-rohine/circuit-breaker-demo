@@ -21,3 +21,6 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Automation scripts
+push_to_github.py
